@@ -62,56 +62,56 @@ static int gettok() {
 }
 
 
-class ExprAst {
+class ExprAST {
  public:
-    virtual ~ExprAst() {};
+    virtual ~ExprAST() {};
 };
 
-class NumberExprAst:ExprAst {
+class NumberExprAST:ExprAST {
 private:
     double Val;
 public:
-    NumberExprAst(double Val):Val(Val) {}
+    NumberExprAST(double Val):Val(Val) {}
 };
 
-class VariableExprAst:ExprAst {
+class VariableExprAST:ExprAST {
 private:
     std::string Name;
 public:
-    VariableExprAst(const std::string &name) : Name(name) {}
+    VariableExprAST(const std::string &name) : Name(name) {}
 };
 
-class BinaryExprAst:ExprAst {
+class BinaryExprAST:ExprAST {
 private:
     char Op;
     /* what do the * mean here?*/
-    ExprAst *LHS, *RHS;
+    ExprAST *LHS, *RHS;
 public:
-    BinaryExprAst(char op, ExprAst *lhs, ExprAst *rhs) : Op(op), LHS(lhs), RHS(rhs) {}
+    BinaryExprAST(char op, ExprAST *lhs, ExprAST *rhs) : Op(op), LHS(lhs), RHS(rhs) {}
 };
 
-class CallExprAst:ExprAst {
+class CallExprAST:ExprAST {
 private:
     std::string Callee;
-    std::vector<ExprAst*> Args;
+    std::vector<ExprAST*> Args;
 public:
-    CallExprAst(const std::string Callee, std::vector<ExprAst*> Args) : Callee(Callee), Args(Args) {}
+    CallExprAST(const std::string Callee, std::vector<ExprAST*> Args) : Callee(Callee), Args(Args) {}
 };
 
-class PrototypeAst /* note this does not inherit from ExprAst */ {
+class PrototypeAST /* note this does not inherit from ExprAST */ {
     std::string Name;
     std::vector<std::string> Args;
 public:
-    PrototypeAst(const std::string &Name, const std::vector<std::string> &args) : Name(Name), Args(args) {}
+    PrototypeAST(const std::string &Name, const std::vector<std::string> &args) : Name(Name), Args(args) {}
 };
 
-class FunctionAst { 
+class FunctionAST { 
     /* a function has a prototype and a body! this is getting cool!!!! */
-    PrototypeAst *Proto;
-    ExprAst *Body;
+    PrototypeAST *Proto;
+    ExprAST *Body;
 public:
     /* QUESTION: what do * and & mean in the arg list. and why are some things const and others not? */
-    FunctionAst(PrototypeAst *Proto, ExprAst *body) : Proto(Proto), Body(body) {}
+    FunctionAST(PrototypeAST *Proto, ExprAST *body) : Proto(Proto), Body(body) {}
 };
     
 static int CurTok;
@@ -119,3 +119,9 @@ static int CurTok;
 static int getNextToken() {
     return CurTok = gettok();
 }
+
+ExprAST *error(const char *Str) {
+    fprintf(stderr, "Error %s\n", Str);
+    return 0;
+}
+
