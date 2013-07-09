@@ -187,3 +187,26 @@ static ExprAST *ParsePrimary() {
     default: return Error("I dont know what this token is");
     }
 }
+
+
+static std::map<char, int> BinOpPrecedence;
+
+static int GetTokPrecedence() {
+    /* returns the precedence of the last binop token */
+    if (!isascii(CurTok)) return -1;
+    int TokPrec = BinoOpPrecedence(CurTok);
+    if TokPrec < 0 return -1;
+    return TokPrec;
+}
+
+static ExprAST *ParseExpression() {
+    ExprAST *LHS = ParsePrimary();
+
+}
+
+int main() {
+    BinOpPrecedence['<'] = 10;
+    BinOpPrecedence['+'] = 20;
+    BinOpPrecedence['-'] = 30;
+    BinOpPrecedence['*'] = 40;
+}
