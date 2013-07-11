@@ -78,16 +78,16 @@ class VariableExprAST: public ExprAST {
 private:
     std::string Name;
 public:
-    VariableExprAST(const std::string &name) : Name(name) {}
+    VariableExprAST(const std::string* name) : Name(name) {}
 };
 
 class BinaryExprAST: public ExprAST {
 private:
     char Op;
-    /* what do the * mean here?*/
-    ExprAST *LHS, *RHS;
+    ExprAST *LHS;
+    ExprAST *RHS;
 public:
-    BinaryExprAST(char op, ExprAST *lhs, ExprAST *rhs) : Op(op), LHS(lhs), RHS(rhs) {}
+    BinaryExprAST(char op, ExprAST* lhs, ExprAST* rhs) : Op(op), LHS(lhs), RHS(rhs) {}
 };
 
 class CallExprAST: public ExprAST {
