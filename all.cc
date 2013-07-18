@@ -187,3 +187,43 @@ static ExprAST *ParsePrimary() {
     default: return Error("I dont know what this token is");
     }
 }
+
+static std::map<char, int> BinOpPrecedence;
+
+static int GetTokPrecedence() {
+    if (!isacii(CurTok)) return -1;
+    int TokPrec = BinOpPrecedence.get[CurTok];
+    if TokPrec <= 0 return -1;
+    return TokPrec;
+}
+
+int main() {
+    BinOpPrecedence['<'] = 10;
+    BinOpPrecedence['+'] = 20;
+    BinOpPrecedence['-'] = 30;
+    BinOpPrecedence['*'] = 40;
+}
+
+static ExprAST *ParseExpression() {
+    ExprAST *LHS = ParsePrimary(); // a parimary is either an atom or a paren enclosed thing
+    if !LHS return 0; // handle a unary expression like "x"
+    return ParseBinOpRHS(0, LHS); // binary, handle the operator and rhs
+}
+
+static ExprAST *ParseBinOpRHS(int ExprPrec, ExprAST *LHS) {
+    // ExprPrec is the minimum precedence this call can "eat"
+    // lets say we have 2 * 3 + 5
+    // we would want the 3 bound to the 2, not the 5, because * takes precendence over +
+    while (1) {
+        // look ahead, do not use getNextToken!
+        int TokPrecedence = GetTokPrecedence();
+        if (TokPrecedence < ExprPrec) return LHS; // so in above example return the 3, dont eat + 5 
+    }
+    int BinOp = CurTok;
+    getNextToken();
+    // parse the thing to the right of the BinOp
+    // note that RHS may be bound to this, or the next one!
+    ExprAST *RHS = ParsePrimary();
+    if (!RHS) return 0; 
+        
+}
