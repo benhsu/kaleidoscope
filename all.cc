@@ -64,7 +64,7 @@ static int gettok() {
 
 
 class ExprAST {
- public:
+public:
     virtual ~ExprAST() {};
 };
 
@@ -244,6 +244,83 @@ static ExprAST *ParseBinOpRHS(int ExprPrec, ExprAST *LHS) {
             if (RHS==0) return 0;
         }
         LHS = new BinaryExprAST(BinOp, LHS, RHS); // effectively we descend here.
-
     }
 }
+
+static PrototypeAST *ParsePrototype() {
+    if (CurTok != tok_identifier) return ErrorP("Expected Function Name in Prototype");
+    std::string FnName = IdentifierStr;
+    getNextToken();
+    if (CurTok!='(') return ErrorP("Expected (");
+    std::vector<std::string> ArgNames;
+    while(CurTok!=')') {
+        ArgNames.push_back(IdentifierStr);
+    }
+    getNextToken(); // eat the ')'
+    return new PrototypeAST(FnName, ArgNames);
+}
+
+static FunctionAST *ParseDefinition() {
+    getNextToken();
+    PrototypeAST *Proto = ParsePrototype();
+    if (Proto==0) return 0; // i can haz exception? 
+    if (ExprAST *E = ParseExpression()) return new FunctionAST(Proto, E);
+    return 0;
+}
+
+static PrototypeAST *ParseExtern() {
+    getNextToken();
+    PrototypeAST *Proto = ParsePrototype();
+    return Proto;
+}
+
+static FunctionAST *ParseTopLevelExpr() {
+    if (ExprAST *E = ParseExpression()) {
+        PrototypeAST *Proto = new PrototypeAST("", std::vector<std::string>()); //dummy proto
+        return new FunctionAST(Proto, E);
+    }
+    return 0;
+}
+
+static void HandleDefinition() {
+    if (ParseDefinition()) {
+        fprintf(stderr, "Parsed a function definition.\n");
+    } else {
+        // Skip token for error recovery.
+        getNextToken();
+    }
+}
+
+static void HandleExtern() {
+    if (ParseExtern()) {
+        fprintf(stderr, "Parsed an extern\n");
+    } else {
+        // Skip token for error recovery.
+        getNextToken();
+    }
+}
+
+static void HandleTopLevelExpression() {
+    // Evaluate a top-level expression into an anonymous function.
+    if (ParseTopLevelExpr()) {
+        fprintf(stderr, "Parsed a top-level expr\n");
+    } else {
+        // Skip token for error recovery.
+        getNextToken();
+    }
+}
+
+static void MainLoop() {
+    while(1) {
+        fprintf(stderr, "ready >");
+        switch(CurTok) {
+        case tok_eof: return;
+        case ';': getNextToken(); break;
+        case tok_def: HandleDefinition(); break;
+        case tok_extern: HandleExtern(); break;
+        default:HandleTopLevelExpression();break;
+        }
+    }
+}
+
+
