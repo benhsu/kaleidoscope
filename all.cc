@@ -211,7 +211,7 @@ int main() {
 
 static ExprAST *ParseExpression() {
     ExprAST *LHS = ParsePrimary(); // a parimary is either an atom or a paren enclosed thing
-    if (!LHS) return 0; // handle a unary expression like "x"
+    if (!LHS) return 0; // return null if nothing
     return ParseBinOpRHS(0, LHS); // binary, handle the operator and rhs
 }
 
@@ -223,24 +223,27 @@ static ExprAST *ParseBinOpRHS(int ExprPrec, ExprAST *LHS) {
     // lets say we have 2 * 3 + 5
     // we would want the 3 bound to the 2, not the 5, because * takes precendence over +
     while (1) {
+        // loop until we have gone all the way down the tree!
         // look ahead, do not use getNextToken!
         int TokPrec = GetTokPrecedence();
         if (TokPrec < ExprPrec) return LHS; // per above example, LHS=3, BinOp=+, RHS=5, since binop has low precedence do not eat binop or rhs and just return the 3
+        // this above is the only non-null return value! its when we've completely eaten the rhs
         int BinOp = CurTok;
         getNextToken();
         // parse the thing to the right of the BinOp
         // note that RHS may be bound to this, or the next one!
         ExprAST *RHS = ParsePrimary();
-        if (!RHS) return 0; // no RHS
+        if (!RHS) return 0; // no RHS. error
     
         // now we have a RHS and a LHS. Decide whether to associate RHS with LHS or the next node
         // look ahead to next token to see if it has higher value than this one
         int NextPrec = GetTokPrecedence();
         if (NextPrec < ExprPrec) {
             RHS = ParseBinOpRHS(TokPrec+1, RHS); // TokPrec is what is associated with the current operator. we want it higher than that
+            // example: (1+2)*3*4*5. we recursive descend on 3 4 5
             if (RHS==0) return 0;
         }
-        LHS = new BinaryExprAST(BinOp, LHS, RHS);
+        LHS = new BinaryExprAST(BinOp, LHS, RHS); // effectively we descend here.
 
     }
 }
