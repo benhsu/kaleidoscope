@@ -202,13 +202,6 @@ static int GetTokPrecedence() {
     return TokPrec;
 }
 
-int main() {
-    BinOpPrecedence['<'] = 10;
-    BinOpPrecedence['+'] = 20;
-    BinOpPrecedence['-'] = 30;
-    BinOpPrecedence['*'] = 40;
-}
-
 static ExprAST *ParseExpression() {
     ExprAST *LHS = ParsePrimary(); // a parimary is either an atom or a paren enclosed thing
     if (!LHS) return 0; // return null if nothing
@@ -323,4 +316,19 @@ static void MainLoop() {
     }
 }
 
+
+int main() {
+    BinOpPrecedence['<'] = 10;
+    BinOpPrecedence['+'] = 20;
+    BinOpPrecedence['-'] = 30;
+    BinOpPrecedence['*'] = 40;
+  // Prime the first token.
+  fprintf(stderr, "ready> ");
+  getNextToken();
+
+  // Run the main "interpreter loop" now.
+  MainLoop();
+
+  return 0;
+}
 
