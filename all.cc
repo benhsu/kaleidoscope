@@ -237,7 +237,7 @@ static ExprAST *ParseBinOpRHS(int ExprPrec, ExprAST *LHS) {
         // look ahead to next token to see if it has higher value than this one
         int NextPrec = GetTokPrecedence();
         if (NextPrec < ExprPrec) {
-            RHS = ParseBinOpRHS(TokPrec+1, RHS); // wtf??? is there a chance tokprec will overwhelm the natural precedence?
+            RHS = ParseBinOpRHS(TokPrec+1, RHS); // TokPrec is what is associated with the current operator. we want it higher than that
             if (RHS==0) return 0;
         }
         LHS = new BinaryExprAST(BinOp, LHS, RHS);
